@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -26,6 +27,7 @@ import nanodegree.udacity.jokedisplaylibrary.JokeDisplayActivity;
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
+    String retrievedJoke;
     private static MyApi myApiService = null;
     ProgressBar spinner;
     Button jokeButton;
@@ -49,6 +51,13 @@ public class MainActivityFragment extends Fragment {
 
     public void tellJoke() {
         new EndpointsAsyncTask().execute(getActivity());
+        if (retrievedJoke != null) {
+            Intent intent = new Intent(getActivity(), JokeDisplayActivity.class);
+            intent.putExtra(JokeDisplayActivity.JOKE_KEY, retrievedJoke);
+            getActivity().startActivity(intent);
+        } else {
+            Toast.makeText(getContext(), R.string.error_message, Toast.LENGTH_SHORT);
+        }
     }
 
     class EndpointsAsyncTask extends AsyncTask<Context, Void, String> {
@@ -95,9 +104,7 @@ public class MainActivityFragment extends Fragment {
         protected void onPostExecute(String result) {
             EspressoIdlingResouce.decrement();
             spinner.setVisibility(View.GONE);
-            Intent intent = new Intent(context, JokeDisplayActivity.class);
-            intent.putExtra(JokeDisplayActivity.JOKE_KEY, result);
-            context.startActivity(intent);
+            retrievedJoke = result;
         }
     }
 }
